@@ -497,10 +497,6 @@ class MainScreen(tk.Frame):
             # Builds the ship. This is repeated as part of the main for loop for the number of ships required.
             build_ship()
 
-        # TEMPORARY: Print diagnostic info.
-        print(self.ships)
-        for i in range(10):
-            print(used_tiles[i])
         self.main_game()
 
     def main_game(self):
@@ -535,7 +531,7 @@ class MainScreen(tk.Frame):
 
             self.main_text.set('You lose.')
             self.sub_text.set(' ')
-            
+
 
 # Configures and runs main application class, Battle.
 app = Battle()

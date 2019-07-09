@@ -2,7 +2,7 @@ import tkinter as tk
 from functools import partial
 from random import randint
 
-# App does not yet fully support changing number and size of ships.
+# NOTE: App does not yet fully support changing number and size of ships.
 SHIPS_BUILT = [5, 4, 3, 3, 2]
 OCEAN_COLOR = 'blue4'
 SHIP_COLOR = 'gray'
@@ -61,10 +61,6 @@ class MainScreen(tk.Frame):
         self.ships['enemy'] = {}
 
         # Creates AI board to keep track of hit attempts.
-        self.attempt_number = 0
-        self.attack_mode = 0
-        self.attack_config = randint(0, 3)
-        self.previous_hit = False
         self.AI_board = []
         for i in range(10):
             self.AI_board.append([0] * 10)
@@ -243,138 +239,7 @@ class MainScreen(tk.Frame):
 
     def enemy_turn(self):
 
-        victory = True
-
-        def check_coords(row, column):
-
-            try:
-
-                if self.AI_board[row][column] != 0:
-
-                    self.enemy_turn()
-
-                else:
-
-                    # self.AI_board[row][column] = 1
-
-                    if check_hit(row, column) != None:
-
-                        ship = check_hit(row, column)
-                        register_hit(ship, row, column)
-
-                    else:
-
-                        register_miss(row, column)
-
-            except IndexError:
-
-                self.enemy_turn()
-
-        def check_hit(row, column):
-
-            for ship in self.ships['player']:
-
-                if (row, column) in self.ships['player'][ship]:
-
-                    return ship
-
-        def register_hit(ship, row, column):
-
-            self.AI_board[row][column] = 2
-            self.previous_hit = (row, column)
-            self.sub_text.set('The enemy hit your battleship.')
-
-            # Changes color of tile on player board.
-            self.buttons['player'][row][column].configure(bg=HIT_COLOR)
-
-            location = self.ships['player'][ship].index((row, column))
-            del self.ships['player'][ship][location]
-            #print(self.ships)
-
-        def register_miss(row, column):
-
-            self.AI_board[row][column] = 1
-            self.previous_hit = False
-            self.sub_text.set('The enemy missed your ships.')
-
-            self.buttons['player'][row][column].configure(text='X', fg='white')
-
-                #print('hi')
-
-        if self.previous_hit == False:
-
-            row = randint(0, 9)
-            column = randint(0, 9)
-
-            check_coords(row, column)
-
-        else:
-
-            if self.attempt_number == 0:
-
-                row = self.previous_hit[0]
-                column = self.previous_hit[1]
-                self.initial_config = randint(0, 3)
-                self.attempt_number = 1
-
-                """try:
-
-                    if initial_config == 0:
-
-                        check_coords(row + 1, column)
-                        self.attempt_number = 1
-
-                    if initial_config == 1:
-
-                        check_coords(row - 1, column)
-                        self.attempt_number = 1
-
-                    if initial_config == 2:
-
-                        check_coords(row, column + 1)
-                        self.attempt_number = 1
-
-                    if initial_config == 3:
-
-                        check_coords(row, column - 1)
-                        self.attempt_number = 1
-
-                except IndexError:
-
-                    self.enemy_turn()"""
-
-            if self.attempt_number > 0:
-
-                row = self.previous_hit[0]
-                column = self.previous_hit[1]
-
-                if self.initial_config == 0:
-
-                    check_coords(row + 1, column)
-
-                if self.initial_config == 1:
-
-                    check_coords(row - 1, column)
-
-                if self.initial_config == 2:
-
-                    check_coords(row, column + 1)
-
-                if self.initial_config == 3:
-
-                    check_coords(row, column - 1)
-
-        for ship in self.ships['player']:
-
-            if self.ships['player'][ship] != []:
-
-                victory = False
-
-        if victory == True:
-
-            self.end_game(False)
-
-        """# Randomly generates row and column guess.
+        # Randomly generates row and column guess.
         row = randint(0, 9)
         column = randint(0, 9)
 
@@ -419,7 +284,7 @@ class MainScreen(tk.Frame):
 
         if victory == True:
 
-            self.end_game(False)"""
+            self.end_game(False)
 
     # Changes state of button_state variable on press of main_button.
     def state_change(self):
@@ -489,7 +354,7 @@ class MainScreen(tk.Frame):
 
                             raise ValueError
 
-                    elif ascending_column[i] == ascending_column[i + 1]:
+                    if ascending_column[i] == ascending_column[i + 1]:
 
                         if ascending_row[i] + 1 != ascending_row[i + 1]:
 
@@ -497,6 +362,10 @@ class MainScreen(tk.Frame):
 
                     # Checks to ensure the ship is horizontal or vertical at all. If not, raises exception.
                     if ascending_row[i] != ascending_row[i + 1] and ascending_column[i] != ascending_column[i + 1]:
+
+                        raise ValueError
+
+                    if ascending_row[i] != ascending_row[i - 1] and ascending_column[i] != ascending_column[i - 1]:
 
                         raise ValueError
 
@@ -629,9 +498,9 @@ class MainScreen(tk.Frame):
             build_ship()
 
         # TEMPORARY: Print diagnostic info.
-        """print(self.ships)
+        print(self.ships)
         for i in range(10):
-            print(used_tiles[i])"""
+            print(used_tiles[i])
         self.main_game()
 
     def main_game(self):
@@ -648,18 +517,6 @@ class MainScreen(tk.Frame):
 
     def end_game(self, victory):
 
-        # Handles victory.
-        if victory == True:
-
-            self.main_text.set('Congratulations,')
-            self.sub_text.set('you win.')
-
-        # Handles loss.
-        if victory == False:
-
-            self.main_text.set('You lose.')
-            self.sub_text.set(' ')
-
         # Disables all buttons.
         for row_num in range(10):
 
@@ -667,6 +524,18 @@ class MainScreen(tk.Frame):
 
                 self.buttons['enemy'][row_num][column_num].configure(state='disabled')
 
+        # Handles victory.
+        if victory == True:
+
+            self.main_text.set('You win.')
+            self.sub_text.set(' ')
+
+        # Handles loss.
+        if victory == False:
+
+            self.main_text.set('You lose.')
+            self.sub_text.set(' ')
+            
 
 # Configures and runs main application class, Battle.
 app = Battle()

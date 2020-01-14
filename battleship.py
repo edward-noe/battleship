@@ -304,7 +304,7 @@ class MainScreen(tk.Frame):
         # Reconfigures main button.
         self.main_button.configure(command=self.state_change)
 
-        number_words = ['first', 'second', 'third', 'forth', 'fifth']
+        number_words = ['first', 'second', 'third', 'fourth', 'fifth']
         tile_words = ['five', 'four', 'three', 'three', 'two']
 
         def create_ship(ship_number):
